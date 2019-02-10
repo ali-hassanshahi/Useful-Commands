@@ -1,3 +1,17 @@
+DNS Enumeration:
+	nslookup
+	  >server 10.10.10.123
+	  >127.0.0.1
+	  >10.10.10.123
+	  >bank.htb
+	  >test.domain.com
+	
+	dnsrecon -r 127.0.0.0/24 -n 10.10.10.123
+	dnsrecon -r 10.10.10.0/24 -n 10.10.10.123
+	
+	dig axfr @10.10.10.123
+	dig axfr bank.htb @10.10.10.123
+	
 Bypass Restricted Shell:
 	ssh USERNAME@SERVER_IP -t bash --noprofile
 
