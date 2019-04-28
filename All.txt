@@ -1,3 +1,5 @@
+HLEP ON COMMAND:
+	https://gtfobins.github.io/
 Masscan:
 	masscan -p1-65535,U:1-65535 IP_ADDRESS --rate=1000 -e tun0
 	
