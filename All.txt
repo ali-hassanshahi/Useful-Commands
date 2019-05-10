@@ -1,5 +1,15 @@
 HLEP ON COMMAND:
 	https://gtfobins.github.io/
+	
+SimpleHTTPServer:
+	IPv4:
+		python2.7 -m SimpleHTTPServer 80
+		
+		python3 -m http.server 80
+		
+	IPv6:
+		echo -e 'import BaseHTTPServer\nimport SimpleHTTPServer\nimport socket\nclass HTTPServer6(BaseHTTPServer.HTTPServer):\n address_family = socket.AF_INET6\nif __name__ == "__main__":\n SimpleHTTPServer.test(ServerClass=HTTPServer6)' | python2
+		
 Masscan:
 	masscan -p1-65535,U:1-65535 IP_ADDRESS --rate=1000 -e tun0
 	
