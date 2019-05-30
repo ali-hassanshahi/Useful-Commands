@@ -119,6 +119,9 @@ Python Library Hijacking:
 Powershell:
 Copy-Item C:\Path\Folder1 -Destination C:\Path\Folder2 -Recurse
 
+Disable Windows Defender:
+Set-MpPreference -DisableRealtimeMonitoring $true
+
 ===========================================================================================================
 Malicious XML To Create MSI File:
 
