@@ -188,3 +188,30 @@ tcpdump port http or port ftp or port smtp or port imap or port pop3 or port tel
 Using TCPDUMP to capture cookies:
 tcpdump -vvAls0 | grep 'Set-Cookie|Host:|Cookie:'
 ==================================================================
+Powershell script to run in Highly Secure Environment:
+
+$password=ConvertTo-SecureString 'P@ssw0rd' -AsPlainText -Force;
+$username='domain.com\user01';
+$Credential =new-object System.Management.Automation.PSCredential($username, $password);
+
+
+#Define a result file where to temporarily store the output of the process.
+#Remove the file if it already exists
+$ResultFile = "$($env:temp)\_tmpresult.txt"
+If (Test-Path $ResultFile)  {
+  Remove-Item $ResultFile
+}
+
+#Set the Arguments for the process
+$ProcessArguments = "Get-Process Explorer; whoami;"
+#Start the process and specify %WINDIR% as working directory
+(Start-Process -FilePath "powershell.exe" -Credential $Credential -ArgumentList $ProcessArguments -WorkingDirectory $env:windir -NoNewWindow -PassThru -RedirectStandardOutput $ResultFile).WaitForExit()
+
+#Read the file, if it exists and remove it afterwards
+If (Test-Path $ResultFile)  {
+  $Result = Get-Content $ResultFile
+  Remove-Item $ResultFile
+  $Result
+}Else  {
+  write-error "File $($ResultFile) does not exist!"
+}
